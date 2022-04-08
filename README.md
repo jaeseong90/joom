@@ -3,7 +3,6 @@ zoom clone (from 노마드 코더)
 
 ## 1. 개발환경준비 및 서버 셋팅
 - 윈도우로 진행했음
-- N
 
 디렉토리 생성하고 npm 개발준비 및 깃 연결
 ```
@@ -121,6 +120,8 @@ html(lang="en")
         script(src="/public/js/app.js") 
 ```
 
+- mvp css 너무 엉망으로 보이지 않기위한 최소한의 스타일 추가 
+
 -server.js 수정
 ```
 import express from 'express';
@@ -143,4 +144,61 @@ const handleListen = () => console.log('Listening on http://localhost:3000');
 app.listen(3000, handleListen);
 ```
 
+## websocket in nodejs
+- ws 라는 node package 활용
+```
+yarn add ws
+```
+- express 는 http 다룸 
+- ws는 별도 
+- http와 ws 다 연결하기때문에 server.js 수정하여 진행
+```
+import http from 'http';
+import WebSocket from 'ws';
 
+const server = http.createServer(app);
+const wsServer = new WebSocket.Server({ server });
+server.listen(3000, handleListen);
+```
+
+## Websocket 
+
+- 웹소켓 이벤트 (server.js)
+```
+
+WebSocket.Server<WebSocket.WebSocket>.on(event: "connection", cb: (this: WebSocket.Server<WebSocket.WebSocket>, socket: WebSocket.WebSocket, request: http.IncomingMessage) => void): WebSocket.Server<...>
+
+wsServer.on('connection', (socket) => {
+  console.log(socket);
+  socket.send('testMessage');
+})
+```
+
+
+- app.js 웹소켓 연결해보자
+```
+var socket = new WebSocket("ws://localhost:3000");
+var socket = new WebSocket(`ws://${window.location.host}`);
+
+socket.addEventListener('open', () => {
+  console.log(`Connected to Server ⭕`);
+});
+
+socket.addEventListener('message', (message) => {
+  console.log(`just got this`, message, 'from server');
+});
+
+socket.addEventListener('close', (ev) => {
+  console.log('Connected from Server ❌');
+});
+
+
+```
+
+
+
+
+- 웹소켓 참고 https://developer.mozilla.org/ko/docs/Web/API/WebSocket/WebSocket
+- ws package https://www.npmjs.com/package/ws
+- mvp css https://andybrewer.github.io/mvp/
+- 노마드 코더 줌 클론코딩 https://nomadcoders.co/noom/lobby
