@@ -9,13 +9,22 @@ html(lang="en")
     body 
         header Joom
             h1 It works! 
-        main 
-            ul
-            form#nickForm
-                input(placeholder="nick" type="text", requerid)
-                button Enter
-            form#messageForm
-                input(placeholder="message" type="text", requerid)
-                button Enter
+        main
+            div#welcome 
+                form 
+                    input(placeholder="romm name" type="text", requerid)
+                    button Enter Room
+            
+            //- 간단한 구현 
+            //- form#nickForm
+            //-     input(placeholder="nick" type="text", requerid)
+            //-     button Enter
+            //- form#messageForm
+            //-     input(placeholder="message" type="text", requerid)
+            //-     button Enter
         
+        script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js") 
+        
+
+        

@@ -1,4 +1,26 @@
 const messageList = document.querySelector('ul');
+
+//socket 생성 메소드 이것은 프레임워크임
+const socket = io();
+
+const welcome = document.getElementById('welcome');
+const form = welcome.querySelector('form');
+
+function handleRoomSubmit(event) {
+  event.preventDefault();
+  const input = form.querySelector('input');
+  console.log(input.value);
+  socket.emit('room_enter', { payload: input.value }, () => {
+    console.log('server is done!');
+  });
+  input.value = '';
+}
+
+form.addEventListener('submit', handleRoomSubmit);
+
+/*
+웹소켓을 활용한 간단한 채팅 구현
+
 const nickForm = document.querySelector('#nickForm');
 const messageForm = document.querySelector('#messageForm');
 
@@ -53,3 +75,4 @@ nickForm.addEventListener('submit', (event) => {
   socket.send(makeMessage('nick', input.value));
   input.value = '';
 });
+*/
