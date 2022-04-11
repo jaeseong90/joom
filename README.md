@@ -165,20 +165,24 @@ server.listen(3000, handleListen);
 
 - 웹소켓 이벤트 (server.js)
 ```
-
-WebSocket.Server<WebSocket.WebSocket>.on(event: "connection", cb: (this: WebSocket.Server<WebSocket.WebSocket>, socket: WebSocket.WebSocket, request: http.IncomingMessage) => void): WebSocket.Server<...>
-
 wsServer.on('connection', (socket) => {
-  console.log(socket);
+  //console.log(socket);
   socket.send('testMessage');
+
+  socket.on('close', () => console.log('disconnected browser'));
+  socket.on('open', () => console.log('connected browser'));
+  socket.on('message', (message) => {
+    console.log(message.toString('utf-8'));
+  });
 })
+
 ```
 
 
 - app.js 웹소켓 연결해보자
 ```
 var socket = new WebSocket("ws://localhost:3000");
-var socket = new WebSocket(`ws://${window.location.host}`);
+const socket = new WebSocket(`ws://${window.location.host}`);
 
 socket.addEventListener('open', () => {
   console.log(`Connected to Server ⭕`);
@@ -186,14 +190,22 @@ socket.addEventListener('open', () => {
 
 socket.addEventListener('message', (message) => {
   console.log(`just got this`, message, 'from server');
+  console.log(message.data);
 });
 
 socket.addEventListener('close', (ev) => {
   console.log('Connected from Server ❌');
 });
 
+socket.addEventListener('error', (ev) => {
+  console.log(ev);
+});
 
+setTimeout(() => {
+  socket.send('hello server');
+}, 1000);
 ```
+
 
 
 

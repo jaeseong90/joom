@@ -20,18 +20,31 @@ const handleListen = () => console.log('Listening on http://localhost:3000');
 //node제공 http 객체 활용=
 const server = http.createServer(app);
 const wsServer = new WebSocket.Server({ server });
-
+wsServer.en;
 // function handleConntection(socket) {
 //   console.log(socket);
 // }
 
+const sockets = [];
+
 wsServer.on('connection', (socket) => {
   socket.send('testMessage');
+  socket['nick'] = 'Anon';
+
+  sockets.push(socket);
 
   socket.on('close', () => console.log('disconnected browser'));
-  socket.on('open', () => console.log('connected browser'));
+
   socket.on('message', (message) => {
-    console.log(message.toString('utf-8'));
+    const parsed = JSON.parse(message);
+    console.log(parsed);
+
+    switch (parsed.type) {
+      case 'new_message':
+        sockets.forEach((socketItem) => socketItem.send(`${socket['nick']} : ${parsed.payload}`));
+      case 'nick':
+        socket['nick'] = parsed.payload;
+    }
   });
 
   //   socket.on('join_room', (roomName) => {
