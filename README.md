@@ -352,12 +352,13 @@ HTTP long-polling fallback, Automatic reconnection, Packet buffering, Acknowledg
 yarn add socket.io
 ```
 
-
 - http://localhost:3000/socket.io/socket.io.js
 - emit 이라는 메소드를 통하여 커스텀 이벤트로 type 없이 전송 가능
 - json parse 안해줘도 socketIO가 전송시 오브젝트를 문자열로 변경하고 받으면 문자열을 오브젝트로 변경
 
-
+- 서버사이드에서 clientCallback 함수 실행 사용 가능
+- dataMessage 객체여부, 문자, 숫자등 타입 관계없이 몇개 넘기든 전송 가능
+- rooms 기능이 socketIO 기본적으로 제공
 
 home.pug
 ```
@@ -412,12 +413,52 @@ socketIOServer.on('connection', (socket) => {
   //console.log(socket);
   socket.on('room_enter', (msg) => {
     console.log(msg);
+
   });
 });
 ```
-- 서버사이드에서 clientCallback 함수 실행 사용 가능
-- dataMessage 객체여부, 문자, 숫자등 타입 관계없이 몇개 넘기든 전송 가능
-- rooms 기능이 socketIO 기본적으로 제공
+
+### SocketIO Adapter
+ - adpter 를 통하여 room 접근
+ - private 과 public room 별도 
+```
+function publicRooms() {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = socketIOServer;
+  const publicRooms = [];
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) {
+      publicRooms.push(key);
+    }
+  });
+  return publicRooms;
+}
+```
+### SocketIO AdminUI
+- 설치
+```
+npm i @socket.io/admin-ui
+```
+- 사용자 넣기 가능
+```
+const socketIOServer = new Server(httpServer, {
+  cors: {
+    origin: ['https://admin.socket.io'],
+    credentials: true,
+  },
+});
+
+instrument(socketIOServer, {
+  auth: false,
+});
+```
+
+- https://admin.socket.io/ 접속하여 url 입력 http://localhost:3000/admin
+
+
 
 #### 참고
 - SocketIO 소켓통신프레임워크 https://socket.io/

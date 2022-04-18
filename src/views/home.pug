@@ -10,10 +10,22 @@ html(lang="en")
         header Joom
             h1 It works! 
         main
+
             div#welcome 
-                form 
+                form#nickForm
+                    input(placeholder="nick" type="text", requerid)
+                    button save
+                form#roomForm
                     input(placeholder="romm name" type="text", requerid)
                     button Enter Room
+                h3 Rooms
+                ul#roomList
+            div#room
+                h3
+                ul#chat
+                form#messageForm
+                    input(placeholder="message" type="text", requerid)
+                    button Send
             
             //- 간단한 구현 
             //- form#nickForm
