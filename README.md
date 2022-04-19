@@ -438,7 +438,7 @@ function publicRooms() {
 }
 ```
 ### SocketIO AdminUI
-- 설치
+- 설치 (powershell 로 설치 시 오류나면 node or cmd 로 설치)
 ```
 npm i @socket.io/admin-ui
 ```
@@ -457,7 +457,168 @@ instrument(socketIOServer, {
 ```
 
 - https://admin.socket.io/ 접속하여 url 입력 http://localhost:3000/admin
+- 쌈박하게 나오네.. 가볍게 운영하기 좋아보임 :D
 
+## MediaStream
+- 시스템설정에 앱에서 미디어 장비 엑세스 허용 후 진행가능
+- navigator.mediaDevices 객체를 통하여 디바이스 접근
+- stream 객체를 통해 tracks 을 받아서 접근
+- 스트림을 다시 받아와서 처리 연결하여 카메라 변경
+- 스트림 이네이블 바꿔서 온오프 처리
+
+home.pug
+```
+video#myFace(autoplay, playsinline, width="400", height="400") 
+            button#btnMute 사운드ON
+            button#btnCamera 카메라ON
+            select#selectCamera
+```
+app.js
+```
+const myFace = document.getElementById('myFace');
+const btnMute = document.getElementById('btnMute');
+const btnCamera = document.getElementById('btnCamera');
+const cameraSelect = document.getElementById('selectCamera');
+let cameraOff = true;
+let muted = true;
+
+let myStream;
+
+async function getMedia(deviceId) {
+  console.log('a');
+  const initialConstrains = {
+    audio: true,
+    video: { facingMode: 'user' },
+  };
+  const cameraConstraints = {
+    audio: true,
+    video: {
+      deviceId: {
+        exact: deviceId,
+      },
+    },
+  };
+
+  try {
+    myStream = await navigator.mediaDevices.getUserMedia(
+      deviceId ? cameraConstraints : initialConstrains,
+    );
+
+    // myStream.getTracks().forEach((track) => {
+    //   track.enabled = false;
+    // });
+
+    //console.log(myStream.getTracks());
+    /* 스트림 사용 */
+    myFace.srcObject = myStream;
+
+    if (!deviceId) {
+      getCamera();
+    }
+  } catch (err) {
+    console.log(err);
+    console.error(err.message);
+    /* 오류 처리 */
+  }
+}
+getMedia();
+
+async function getCamera() {
+  try {
+    const mediaDevices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = mediaDevices.filter((device) => device.kind === 'videoinput');
+    const currentCamera = myStream.getVideoTracks()[0];
+    cameras.forEach((camera) => {
+      const option = document.createElement('option');
+      option.value = camera.deviceId;
+      option.text = camera.label;
+      if (currentCamera.label === camera.label) {
+        option.selected = true;
+      }
+      cameraSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.log(err);
+    console.error(err.message);
+  }
+}
+
+function handleBtnMuteClick(event) {
+  try {
+    myStream.getAudioTracks().forEach((track) => {
+      track.enabled = !track.enabled;
+    });
+  } catch (err) {
+    console.error(err.message);
+  }
+
+  if (!muted) {
+    btnMute.innerHTML = '사운드ON';
+  } else {
+    btnMute.innerText = '사운드OFF';
+  }
+  muted = !muted;
+}
+
+function handleBtnCameraClick(event) {
+  try {
+    myStream.getVideoTracks().forEach((track) => {
+      track.enabled = !track.enabled;
+    });
+  } catch (err) {
+    console.error(err.message);
+  }
+
+  if (!cameraOff) {
+    btnCamera.innerText = '카메라ON';
+  } else {
+    btnCamera.innerText = '카메라OFF';
+  }
+  cameraOff = !cameraOff;
+}
+
+function handleCameraCSelectInput() {
+  getMedia(cameraSelect.value);
+}
+
+btnMute.addEventListener('click', handleBtnMuteClick);
+btnCamera.addEventListener('click', handleBtnCameraClick);
+cameraSelect.addEventListener('input', handleCameraCSelectInput);
+```
+
+## WebRTC(Web Real-Time Communication)
+- 웹 애플리케이션과 사이트가 중간자 없이 브라우저 간에 오디오나 영상 미디어를 포착하고 마음대로 스트림 할 뿐 아니라, 임의의 데이터도 교환할 수 있도록 하는 기술(peer to peer)
+- 서버는 브라우저 settings, configration, 위치 전달
+
+
+### socketIO 를 통하여 RTC 연결해보자
+1. getUserMedia
+2. addStream(addTrack)
+3. createPeerWebRTC
+4. createOffer
+5. setLocalDescription
+6. send off to server by socketIO
+7. send off to client(room member)
+8. setRemoteDescription
+9. createAnswer
+10. setLocalDescription(answer)
+
+#### RTCIceCandidate
+- RTCIceCandidate 인터페이스는 WebRTC API의 한 종류로서, RTCPeerConnection을 구축 할 때 사용되기도하는 Internet Connectivity Establishment (ICE (en-US))의 후보군 (candidate)를 말합니다.
+
+하나의 ICE candidate는 WebRTC가 원격 장치와 통신을 하기 위해 요구되는 프로토콜과 라우팅에 대해 알려줍니다. WebRTC 피어 연결을 처음 시작하게되면, 일반적으로 여러개의 candiate들이 연결의 각 end에 의해 만들어집니다. 그리고 이 과정은 로컬 유저와 원격 유저가 연결을 위해 최고의 방법을 서로의 동의하에 선택하기 전까지 계속 됩니다. 이후에 WebRTC가 선택한 candidate를 사용해서 연결을 시도시도하게됩니다.
+
+### local tunnel 
+- Localtunnel allows you to easily share a web service on your local development machine without messing with DNS and firewall settings
+```
+npm install -g localtunnel
+lt --port 3000
+your url is: https://xxxxxxxxxx
+```
+
+### STUN Server
+- 별도 공부
+- google 서버로 대체
 
 
 #### 참고
@@ -467,3 +628,8 @@ instrument(socketIOServer, {
 - ws package https://www.npmjs.com/package/ws
 - mvp css https://andybrewer.github.io/mvp/
 - 노마드 코더 줌 클론코딩 https://nomadcoders.co/noom/lobby
+- mediaStream https://developer.mozilla.org/ko/docs/Web/API/MediaDevices/
+- webRTC https://developer.mozilla.org/ko/docs/Web/API/RTCPeerConnection
+- RTCIceCandidate https://developer.mozilla.org/ko/docs/Web/API/RTCIceCandidate
+- localtunnel http://localtunnel.github.io/www/
+- stun https://alnova2.tistory.com/1110

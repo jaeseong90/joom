@@ -2,6 +2,7 @@
 import http from 'http';
 import express from 'express';
 import { SocketIO, Server } from 'socket.io';
+import { off } from 'process';
 
 const app = express();
 const { instrument } = require('@socket.io/admin-ui');
@@ -82,6 +83,25 @@ socketIOServer.on('connection', (socket) => {
   socket.on('nickName', (payload, clientCallback) => {
     socket['nickName'] = payload.nickName;
     clientCallback();
+  });
+
+  //----call
+
+  socket.on('join_room', (room) => {
+    socket.join(room);
+    socket.to(room).emit('callWelcome');
+  });
+
+  socket.on('offer', (offer, roomName) => {
+    socket.to(roomName).emit('offer', offer);
+  });
+
+  socket.on('answer', (answer, roomName) => {
+    socket.to(roomName).emit('answer', answer);
+  });
+
+  socket.on('ice', (ice, roomName) => {
+    socket.to(roomName).emit('ice', ice);
   });
 });
 

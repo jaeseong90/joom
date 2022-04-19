@@ -11,12 +11,30 @@ html(lang="en")
             h1 It works! 
         main
 
+            
+
+            div#call
+                div#callRoom
+                    form#callRoomForm
+                        input(placeholder="romm name" type="text", required)
+                        button Enter Room
+
+                div#callVideo
+                    video#myFace(autoplay, playsinline, width="400", height="400") 
+                    button#btnMute 사운드ON
+                    button#btnCamera 카메라ON
+                    select#selectCamera
+                    video#peerVideo(autoplay, playsinline, width="400", height="400") 
+
+            hr
+            h1 SocketIO 채팅
+
             div#welcome 
                 form#nickForm
-                    input(placeholder="nick" type="text", requerid)
+                    input(placeholder="nick" type="text", required)
                     button save
                 form#roomForm
-                    input(placeholder="romm name" type="text", requerid)
+                    input(placeholder="romm name" type="text", required)
                     button Enter Room
                 h3 Rooms
                 ul#roomList
@@ -24,15 +42,15 @@ html(lang="en")
                 h3
                 ul#chat
                 form#messageForm
-                    input(placeholder="message" type="text", requerid)
+                    input(placeholder="message" type="text", required)
                     button Send
             
             //- 간단한 구현 
             //- form#nickForm
-            //-     input(placeholder="nick" type="text", requerid)
+            //-     input(placeholder="nick" type="text", required)
             //-     button Enter
             //- form#messageForm
-            //-     input(placeholder="message" type="text", requerid)
+            //-     input(placeholder="message" type="text", required)
             //-     button Enter
         
         script(src="/socket.io/socket.io.js")
