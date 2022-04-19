@@ -589,7 +589,7 @@ cameraSelect.addEventListener('input', handleCameraCSelectInput);
 ## WebRTC(Web Real-Time Communication)
 - 웹 애플리케이션과 사이트가 중간자 없이 브라우저 간에 오디오나 영상 미디어를 포착하고 마음대로 스트림 할 뿐 아니라, 임의의 데이터도 교환할 수 있도록 하는 기술(peer to peer)
 - 서버는 브라우저 settings, configration, 위치 전달
-
+- peer 가 많아지면 느려진다는 단점이 있지.. 큰곳은 SFU
 
 ### socketIO 를 통하여 RTC 연결해보자
 1. getUserMedia
@@ -602,6 +602,7 @@ cameraSelect.addEventListener('input', handleCameraCSelectInput);
 8. setRemoteDescription
 9. createAnswer
 10. setLocalDescription(answer)
+11. ...
 
 #### RTCIceCandidate
 - RTCIceCandidate 인터페이스는 WebRTC API의 한 종류로서, RTCPeerConnection을 구축 할 때 사용되기도하는 Internet Connectivity Establishment (ICE (en-US))의 후보군 (candidate)를 말합니다.
@@ -619,6 +620,7 @@ your url is: https://xxxxxxxxxx
 ### STUN Server
 - 별도 공부
 - google 서버로 대체
+- 서비스 하려면 별도로 만들어야함
 
 
 #### 참고
